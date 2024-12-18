@@ -1,6 +1,9 @@
 package io.hhplus.tdd.Integration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
 import io.hhplus.tdd.domain.PointHistory;
@@ -9,6 +12,9 @@ import io.hhplus.tdd.domain.UserPoint;
 import io.hhplus.tdd.service.PointService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,5 +87,30 @@ public class PointServiceTest {
     UserPoint result = pointService.pointUse(4L, 150L);
     // then
     assertThat(result.point()).isEqualTo(50L);
+  }
+
+  @Test
+  void 동시성_제어_테스트() throws InterruptedException {
+
+    ExecutorService executorService = Executors.newFixedThreadPool(3);
+    CountDownLatch countDownLatch = new CountDownLatch(5);
+    // given
+    // when
+    for (int i = 0; i < 5; i++) {
+      executorService.submit(() -> {
+        try {
+          pointService.pointCharge(6L, 200L);
+          pointService.pointUse(6L, 100L);
+        } finally {
+          countDownLatch.countDown();
+        }
+      });
+    }
+    countDownLatch.await();
+    executorService.shutdown();
+    Long point = pointService.getUserPoint(6L).point();
+    // then
+    assertEquals(500L, point);
+    pointService.getPointHistories(6L).forEach(System.out::println);
   }
 }
