@@ -35,7 +35,7 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_내역_조회(){
+  void 유저_포인트_내역_조회_여러건_성공(){
     // given
     pointHistoryTable.insert(2L, 100L, TransactionType.CHARGE, 100);
     pointHistoryTable.insert(2L, 50L, TransactionType.CHARGE, 200);
@@ -51,7 +51,18 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_충전(){
+  void 유저_포인트_내역_조회_내역없음_성공(){
+    // given
+
+    List<PointHistory> ph = List.of ();
+    // when
+    List<PointHistory> result = pointService.getPointHistories(2L);
+    // then
+    assertThat(result).isEqualTo(ph);
+  }
+
+  @Test
+  void 유저_포인트_충전_성공(){
     // given
     UserPoint userPoint = userPointTable.insertOrUpdate(3L, 100L);
     // when
@@ -61,7 +72,7 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_사용(){
+  void 유저_포인트_사용_성공(){
     // given
     UserPoint userPoint = userPointTable.insertOrUpdate(4L, 200L);
     // when
