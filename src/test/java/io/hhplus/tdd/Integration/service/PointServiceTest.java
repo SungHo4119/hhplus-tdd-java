@@ -1,13 +1,13 @@
 package io.hhplus.tdd.Integration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
 import io.hhplus.tdd.domain.PointHistory;
 import io.hhplus.tdd.domain.TransactionType;
 import io.hhplus.tdd.domain.UserPoint;
 import io.hhplus.tdd.service.PointService;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +37,19 @@ public class PointServiceTest {
   @Test
   void 유저_포인트_내역_조회_여러건_성공(){
     // given
-    pointHistoryTable.insert(2L, 100L, TransactionType.CHARGE, 100);
-    pointHistoryTable.insert(2L, 50L, TransactionType.CHARGE, 200);
+    List<PointHistory> l = new ArrayList<>();
+    l.add(pointHistoryTable.insert(2L, 50L, TransactionType.CHARGE, 100));
+    l.add(pointHistoryTable.insert(2L, 50L, TransactionType.CHARGE, 200));
+//  테스트 순서가 보장되지 않아 오류 수정 ( ID )
+//     List<PointHistory> ph = List.of(
+//         new PointHistory(1,2L, 100L, TransactionType.CHARGE, 100),
+//         new PointHistory(2,2L, 50L, TransactionType.CHARGE, 200)
+//     );
 
-    List<PointHistory> ph = List.of (
-      new PointHistory(1L,2L, 100L, TransactionType.CHARGE, 100),
-      new PointHistory(2L, 2L, 50L, TransactionType.CHARGE, 200)
-    );
     // when
     List<PointHistory> result = pointService.getPointHistories(2L);
     // then
-    assertThat(result).isEqualTo(ph);
+    assertThat(result).isEqualTo(l);
   }
 
   @Test
@@ -56,7 +58,7 @@ public class PointServiceTest {
 
     List<PointHistory> ph = List.of ();
     // when
-    List<PointHistory> result = pointService.getPointHistories(2L);
+    List<PointHistory> result = pointService.getPointHistories(5L);
     // then
     assertThat(result).isEqualTo(ph);
   }
