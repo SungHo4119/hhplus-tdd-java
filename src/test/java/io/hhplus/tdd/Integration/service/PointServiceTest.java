@@ -11,9 +11,11 @@ import io.hhplus.tdd.domain.UserPoint;
 import io.hhplus.tdd.service.PointService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,13 +24,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class PointServiceTest {
 
   @Autowired
-  private PointService pointService;
-
-  @Autowired
   UserPointTable userPointTable;
-
   @Autowired
   PointHistoryTable pointHistoryTable;
+  @Autowired
+  private PointService pointService;
 
   @Test
   void 유저_포인트_조회_성공() {
@@ -91,15 +91,16 @@ public class PointServiceTest {
 
   @Test
   void 동시성_제어_테스트() throws InterruptedException {
+    int count = 10;
 
-    ExecutorService executorService = Executors.newFixedThreadPool(3);
-    CountDownLatch countDownLatch = new CountDownLatch(5);
+    ExecutorService executorService = Executors.newFixedThreadPool(5);
+    CountDownLatch countDownLatch = new CountDownLatch(count);
     // given
     // when
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < count; i++) {
       executorService.submit(() -> {
         try {
-          pointService.pointCharge(6L, 200L);
+          pointService.pointCharge(6L, 100L);
           pointService.pointUse(6L, 100L);
         } finally {
           countDownLatch.countDown();
@@ -110,7 +111,13 @@ public class PointServiceTest {
     executorService.shutdown();
     Long point = pointService.getUserPoint(6L).point();
     // then
-    assertEquals(500L, point);
-    pointService.getPointHistories(6L).forEach(System.out::println);
+    // 최종 포인트 정합성 검사
+    assertEquals(0, point);
+    // 호출 횟수 확인
+    Map<TransactionType, Long> typeCount = pointService.getPointHistories(6L).stream()
+        .collect(Collectors.groupingBy(PointHistory::type, Collectors.counting()));
+
+    assertEquals(count, typeCount.getOrDefault(TransactionType.CHARGE, 0L));
+    assertEquals(count, typeCount.getOrDefault(TransactionType.USE, 0L));
   }
 }
