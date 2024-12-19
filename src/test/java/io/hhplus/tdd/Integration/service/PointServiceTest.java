@@ -2,7 +2,6 @@ package io.hhplus.tdd.Integration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
@@ -21,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class PointServiceTest {
+
   @Autowired
   private PointService pointService;
 
@@ -31,7 +31,7 @@ public class PointServiceTest {
   PointHistoryTable pointHistoryTable;
 
   @Test
-  void 유저_포인트_조회_성공(){
+  void 유저_포인트_조회_성공() {
     // given
     UserPoint userPoint = userPointTable.insertOrUpdate(1L, 100L);
     // when
@@ -41,7 +41,7 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_내역_조회_여러건_성공(){
+  void 유저_포인트_내역_조회_여러건_성공() {
     // given
     List<PointHistory> l = new ArrayList<>();
     l.add(pointHistoryTable.insert(2L, 50L, TransactionType.CHARGE, 100));
@@ -59,10 +59,10 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_내역_조회_내역없음_성공(){
+  void 유저_포인트_내역_조회_내역없음_성공() {
     // given
 
-    List<PointHistory> ph = List.of ();
+    List<PointHistory> ph = List.of();
     // when
     List<PointHistory> result = pointService.getPointHistories(5L);
     // then
@@ -70,7 +70,7 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_충전_성공(){
+  void 유저_포인트_충전_성공() {
     // given
     UserPoint userPoint = userPointTable.insertOrUpdate(3L, 100L);
     // when
@@ -80,7 +80,7 @@ public class PointServiceTest {
   }
 
   @Test
-  void 유저_포인트_사용_성공(){
+  void 유저_포인트_사용_성공() {
     // given
     UserPoint userPoint = userPointTable.insertOrUpdate(4L, 200L);
     // when
