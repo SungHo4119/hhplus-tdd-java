@@ -61,7 +61,6 @@ public class PointServiceTest {
   @Test
   void 유저_포인트_내역_조회_내역없음_성공() {
     // given
-
     List<PointHistory> ph = List.of();
     // when
     List<PointHistory> result = pointService.getPointHistories(5L);
@@ -72,7 +71,7 @@ public class PointServiceTest {
   @Test
   void 유저_포인트_충전_성공() {
     // given
-    UserPoint userPoint = userPointTable.insertOrUpdate(3L, 100L);
+    userPointTable.insertOrUpdate(3L, 100L);
     // when
     UserPoint result = pointService.pointCharge(3L, 100L);
     // then
@@ -82,7 +81,7 @@ public class PointServiceTest {
   @Test
   void 유저_포인트_사용_성공() {
     // given
-    UserPoint userPoint = userPointTable.insertOrUpdate(4L, 200L);
+    userPointTable.insertOrUpdate(4L, 200L);
     // when
     UserPoint result = pointService.pointUse(4L, 150L);
     // then
