@@ -8,7 +8,6 @@ import io.hhplus.tdd.domain.UserPoint;
 import io.hhplus.tdd.utils.ValidationUtils;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +48,7 @@ public class PointService {
 
     Lock lock = map.computeIfAbsent(id, k -> new ReentrantLock(true));
     lock.lock();
-    try{
+    try {
       return pointHistoryTable.selectAllByUserId(id);
     } finally {
       lock.unlock();
@@ -108,7 +107,7 @@ public class PointService {
           updateUserPoint.updateMillis());
 
       return updateUserPoint;
-    }finally {
+    } finally {
       lock.unlock();
     }
 
